@@ -38,27 +38,36 @@
 	// Client 에서 폼에서 넘어오는 값을 DataBase에 저장 
 	
 	String sql = null ;         // sql : DataBase에 insert 쿼리를 담은 문자열 . 
-	Statement stmt = null; 		// Statement 
-	
-	// Statement 객체 생성 : 쿼리를 DB에 (insert, update, delete ) 쿼리를 실행하는 객체 
-	// Statement : Connection 객체의 createStatement() 로 객체를 활성화 
-	stmt = conn.createStatement();  
-	
+	PreparedStatement pstmt = null; 		// PreparedStatement 
 	
 	sql = "insert into guestboard ( name, email , inputdate, subject, content ) "; 
-	sql = sql + "values ('" + na + "','" + em + "','" + ymd + "','" + sub +"','" + cont + "')"; 
+	sql = sql + "values (?,?,?,?,?)"; 
 	
+	// PreparedStatement 객체 생성 : 쿼리를 DB에 (insert, update, delete ) 쿼리를 실행하는 객체 
+	// PreparedStatement : Connection 객체의 createStatement() 로 객체를 활성화 
+	pstmt = conn.prepareStatement(sql);  
+	
+	// ?로 처리된 변수에 값 할당
+	pstmt.setString(1, na);		// 첫번째 ?	<== na
+	pstmt.setString(2, em);		// 두번째 ?	<== em
+	pstmt.setString(3, ymd);	// 세번째 ?	<== ymd
+	pstmt.setString(4, sub);	// 네번째 ?	<== sub
+	pstmt.setString(5, cont);	// 다섯번째 ?	<== cont
+	
+	// 실행
+
 	try {
 	// stmt 객체에 sql 퀄리를 넣어서 DB에 저장 : 
-	stmt.executeUpdate(sql);  	// insert , update, delete 쿼리일때 사용  , 톰켓 기본설정은 commit이 작동됨 
+	pstmt.executeUpdate();  	// insert , update, delete 쿼리일때 사용  , 톰켓 기본설정은 commit이 작동됨 
 		// DB 연결에 문제가 생길시 오류발생 : try catch 로 묶어 주어야 한다. 
 	} catch (Exception e) {
 		//오류 발생시 실행 
+		e.printStackTrace();
 		out.println ("DB연결에 문제가 발생했습니다. 고객센터로 연락 바랍니다. 010-111-1111"); 
 		
 	}finally {
 		conn.close(); 
-		stmt.close(); 
+		pstmt.close(); 
 	} 
 %>
 
